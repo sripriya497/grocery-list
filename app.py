@@ -9,15 +9,22 @@ CORS(app)  # Enable CORS for Webflow
 def load_product_data():
     return pd.read_csv("products.csv")
 
-@app.route("/check_products", methods=["POST"])
+@app.route('/check_products', methods=['POST'])
 def check_products():
-    data = request.json
-    grocery_list = data.get("items", [])
+    if request.content_type != 'application/json':
+        return jsonify({"error": "Content-Type must be application/json"}), 415  # Unsupported Media Type
+    
+    try:
+        data = request.get_json()  # Load JSON data
+        if not data or "items" not in data:
+            return jsonify({"error": "Invalid JSON data"}), 400  # Bad Request
+        
+        # Example response (Modify this based on your logic)
+        return jsonify({"message": "Success", "received_items": data["items"]}), 200
 
-    products_df = load_product_data()
-    matched_products = products_df[products_df["product_name"].isin(grocery_list)]
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  # Internal Server Error
 
-    return jsonify(matched_products.to_dict(orient="records"))
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
+    
