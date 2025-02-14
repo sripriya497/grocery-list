@@ -17,13 +17,19 @@ def check_products():
         return jsonify({"error": "Content-Type must be application/json"}), 415  # Unsupported Media Type
     
     try:
-        data = request.get_json()  # Load JSON data
+        data = request.get_json()
+    
         if not data or "items" not in data:
-            return jsonify({"error": "Invalid JSON data"}), 400  # Bad Request
-        
-        # Example response (Modify this based on your logic)
-        return jsonify({"message": "Success", "received_items": data["items"]}), 200
+            return jsonify({"error": "Invalid request"}), 400
+    
+        results = []
+        for item in data["items"]:
+            results.append({
+                "name": item,
+                "status": "Checked",
+            })
 
+        return jsonify(results), 200  # Send structured JSON
     except Exception as e:
         return jsonify({"error": str(e)}), 500  # Internal Server Error
 
