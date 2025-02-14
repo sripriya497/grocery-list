@@ -12,6 +12,8 @@ def load_product_data():
 @app.route('/check_products', methods=['POST'])
 def check_products():
     if request.content_type != 'application/json':
+        print("Headers:", request.headers)
+        print("Raw Data:", request.data)
         return jsonify({"error": "Content-Type must be application/json"}), 415  # Unsupported Media Type
     
     try:
