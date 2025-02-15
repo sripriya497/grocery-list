@@ -12,8 +12,6 @@ def load_product_data():
 @app.route('/check_products', methods=['POST'])
 def check_products():
     if request.content_type != 'application/json':
-        print("Headers:", request.headers)
-        print("Raw Data:", request.data)
         return jsonify({"error": "Content-Type must be application/json"}), 415  # Unsupported Media Type
     
     try:
@@ -21,14 +19,15 @@ def check_products():
     
         if not data or "items" not in data:
             return jsonify({"error": "Invalid request"}), 400
-    
-        results = []
-        for item in data["items"]:
-            results.append({
-                "name": item,
-                "status": "Checked",
-            })
-
+        
+        # Ensure 'items' is a list, splitting if necessary
+        if isinstance(data["items"], str):
+            items = data["items"].split(",")  # Split string into a list
+        else:
+            items = data["items"]
+        
+        results = [{"name": item.strip()} for item in items]  # Clean up spaces
+        
         return jsonify(results), 200  # Send structured JSON
     except Exception as e:
         return jsonify({"error": str(e)}), 500  # Internal Server Error
